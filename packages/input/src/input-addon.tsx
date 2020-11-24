@@ -1,9 +1,13 @@
 import {
   chakra,
   forwardRef,
+  omitThemingProps,
+  ThemingProps,
+  useStyleConfig,
   useStyles,
   HTMLChakraProps,
 } from "@chakra-ui/system"
+
 import { cx, __DEV__ } from "@chakra-ui/utils"
 import * as React from "react"
 
@@ -22,6 +26,11 @@ const placements = {
   },
 }
 
+const componentNamesByPlacement = {
+  left: "InputLeftAddon",
+  right: "InputRightAddon" 
+}
+
 const StyledAddon = chakra("div", {
   baseStyle: {
     flex: "0 0 auto",
@@ -32,7 +41,7 @@ const StyledAddon = chakra("div", {
   },
 })
 
-export interface InputAddonProps extends HTMLChakraProps<"div"> {
+export interface InputAddonProps extends HTMLChakraProps<"div">, ThemingProps {
   placement?: Placement
 }
 
@@ -43,16 +52,21 @@ export interface InputAddonProps extends HTMLChakraProps<"div"> {
  */
 export const InputAddon = forwardRef<InputAddonProps, "div">(
   function InputAddon(props, ref) {
-    const { placement = "left", ...rest } = props
+    
+    const { placement = "left", ...rest } = omitThemingProps(props);
+
+    const styles = useStyleConfig(componentNamesByPlacement[placement] || componentNamesByPlacement.left, props)
+    
     const placementStyles = placements[placement] ?? {}
-    const styles = useStyles()
+    const inputgroupInheritedStyles = useStyles()
 
     return (
       <StyledAddon
         ref={ref}
         {...rest}
         __css={{
-          ...styles.addon,
+          ...inputgroupInheritedStyles.addon,
+          ...styles,
           ...placementStyles,
         }}
       />
